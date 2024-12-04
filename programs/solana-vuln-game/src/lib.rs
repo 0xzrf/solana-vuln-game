@@ -55,7 +55,70 @@ pub mod solana_vuln_game {
         ctx.accounts.user.points = ctx.accounts.user.points.checked_add(100).expect("Overflow occured");
 
         Ok(())
+    }   
+    pub fn input_validation(ctx: Context<PassTest>, answer: String) -> Result<()> {
+        validate_inputs(
+            answer, 
+            "2bc76b3209c3ae44d538f880d94a290445bcf7e1a6df7b5db47e5ca9428b015c",
+            ctx.accounts.user_ata.to_account_info(), 
+            ctx.accounts.config.to_account_info(), 
+            ctx.accounts.mint_account.to_account_info(),
+            ctx.accounts.token_program.to_account_info(),
+            ctx.accounts.config.bump
+        )?;
+
+        ctx.accounts.user.points = ctx.accounts.user.points.checked_add(100).expect("Overflow occured");
+
+        Ok(())
+    }  
+
+    pub fn arithmetic_underflow(ctx: Context<PassTest>, answer: String) -> Result<()> {
+        validate_inputs(
+            answer, 
+            "92968f22c9b1fc76f6c7debdb837dd991f73379bf4bfa1c63daedce4a761b0e3", 
+            ctx.accounts.user_ata.to_account_info(), 
+            ctx.accounts.config.to_account_info(), 
+            ctx.accounts.mint_account.to_account_info(),
+            ctx.accounts.token_program.to_account_info(),
+            ctx.accounts.config.bump
+        )?;
+
+        ctx.accounts.user.points = ctx.accounts.user.points.checked_add(100).expect("Overflow occured");
+
+        Ok(())
+    }   
+
+    pub fn arithmetic_overflow(ctx: Context<PassTest>, answer: String) -> Result<()> {
+        validate_inputs(
+            answer, 
+            "e88bd622ecee27bc73d3dc61f49e5b989f617716359e659b14412e945e19563b", 
+            ctx.accounts.user_ata.to_account_info(), 
+            ctx.accounts.config.to_account_info(), 
+            ctx.accounts.mint_account.to_account_info(),
+            ctx.accounts.token_program.to_account_info(),
+            ctx.accounts.config.bump
+        )?;
+
+        ctx.accounts.user.points = ctx.accounts.user.points.checked_add(100).expect("Overflow occured");
+
+        Ok(())
     }    
+
+    pub fn program_id_verification(ctx: Context<PassTest>, answer: String) -> Result<()> {
+        validate_inputs(
+            answer, 
+            "e3af90ff0ad9833f839289f890a1e6d81cd66e4cb419272ab21668d57133de57", 
+            ctx.accounts.user_ata.to_account_info(), 
+            ctx.accounts.config.to_account_info(), 
+            ctx.accounts.mint_account.to_account_info(),
+            ctx.accounts.token_program.to_account_info(),
+            ctx.accounts.config.bump
+        )?;
+
+        ctx.accounts.user.points = ctx.accounts.user.points.checked_add(100).expect("Overflow occured");
+
+        Ok(())
+    }  
 }
 
 
@@ -72,10 +135,16 @@ pub struct PassTest<'info> {
     pub config: Account<'info, Config>,
 
     // The platform's mint
+    #[account(
+        mut,
+        seeds = [b"payment_token", config.admin.as_ref(), config.key().as_ref()],
+        bump,
+    )]
     pub mint_account: InterfaceAccount<'info, Mint>,
 
     #[account(
-        seeds = [b"user_account", signer.key.as_ref()],
+        mut,
+        seeds = [b"user_account", signer.key().as_ref()],
         bump = user.user_bump
     )]
     pub user: Account<'info, UserState>,

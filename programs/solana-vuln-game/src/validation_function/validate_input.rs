@@ -13,6 +13,8 @@ pub fn validate_inputs<'info>(
 ) -> Result<()> {
     let hash = digest(sig);
 
+    msg!("Hash:::{}", hash);
+
     require!(hash == expect, ErrorCode::InvalidInput);
     // Create the signer seeds for the platform payment mint's authority
     let mint_accounts = MintTo {
