@@ -14,6 +14,7 @@ pub struct TransferPoints<'info> {
         bump
     )]
     pub receiver: Account<'info, User>,
+    /// CHECK: THis is part of the vuln. programs
     #[account(mut)]
     pub signer: AccountInfo<'info>,
     pub system_program: Program<'info, System>,
@@ -26,7 +27,7 @@ impl<'info> TransferPoints<'info> {
         let receiver = &mut self.receiver;
 
         if sender.points < amount {
-            return err!(ErrorCode::NotEnoughPoints);
+            return err!(Error::NotEnoughPoints);
         }
         sender.points -= amount;
         receiver.points += amount;
@@ -36,7 +37,7 @@ impl<'info> TransferPoints<'info> {
 }
 
 #[error_code]
-pub enum ErrorCode {
+pub enum Error {
     #[msg("No Enough Points")]
     NotEnoughPoints
 }

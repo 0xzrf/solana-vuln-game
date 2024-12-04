@@ -1,5 +1,5 @@
 pub use anchor_lang::prelude::*;
-use crate::states::user::User;
+use crate::states::vul_state::User;
 
 #[derive(Accounts)]
 #[instruction(id: u64)]
@@ -16,7 +16,6 @@ pub struct CreateUser<'info> {
     pub user: Account<'info, User>,
     pub system_program: Program<'info, System>
 }
-
 
 impl<'info> CreateUser<'info> {
     pub fn init_user(&mut self, name: String) -> Result<()> {
