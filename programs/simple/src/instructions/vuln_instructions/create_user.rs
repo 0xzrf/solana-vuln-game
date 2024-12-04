@@ -1,9 +1,5 @@
 pub use anchor_lang::prelude::*;
-use crate::{
-    states::user::User,
-    validation_function::validate_input::validate_input
-};
-pub use sha256::digest;
+use crate::states::user::User;
 
 #[derive(Accounts)]
 #[instruction(id: u64)]
@@ -23,28 +19,14 @@ pub struct CreateUser<'info> {
 
 
 impl<'info> CreateUser<'info> {
-    pub fn create_user(&mut self, sig: String, name: String) -> Result<()> {
+    pub fn init_user(&mut self, name: String) -> Result<()> {
         
-        validate_input(sig).expect("unable");
         self.user.set_inner(User {
             name,
             owner: self.user_creator.key(),
             points: 1000
         });
 
-
         Ok(())
-    }
-
-    pub fn validate_inputs(&self, sig: String) -> Result<()> {
-
-        let hash = digest(sig);
-        
-        if (hash == "c0754dd78e6e35d7b10126a84772c7aabd31e1ab08652581694f5a328e6f19bc"){
-            
-            return Ok(());
-        }else {
-            return error!("");
-        }   
     }
 }
