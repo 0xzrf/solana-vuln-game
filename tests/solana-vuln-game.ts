@@ -243,4 +243,50 @@ describe("solana-vuln-game", () => {
     }
   });
 
+  it("Arithmetic overflow checks", async () => {
+    const validAnswer = "receiver.points.checked_add(amount).unwrap()?";
+    const userATA = getAssociatedTokenAddressSync(tokenMint, payer.publicKey, true);
+
+    await program.methods.arithmeticOverflow(validAnswer)
+      .accountsStrict({
+        signer: payer.publicKey,
+        config,
+        mintAccount: tokenMint,
+        user: user,
+        userAta: userATA,
+        systemProgram,
+        tokenProgram,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID
+      })
+      .signers([payer])
+      .rpc();
+
+    const userAccount = await program.account.userState.fetch(user);
+    assert.equal(userAccount.points, 500, "User points should be 100 after valid input");
+  });
+
+  it("Fails if wrong answer is given as input for overflow", async () => {
+    const invalidAnswer = "wrong_answer";
+    const userATA = getAssociatedTokenAddressSync(tokenMint, payer.publicKey, true);
+
+    try {
+      await program.methods.arithmeticOverflow(invalidAnswer)
+        .accountsStrict({
+          signer: payer.publicKey,
+          config,
+          mintAccount: tokenMint,
+          user: user,
+          userAta: userATA,
+          systemProgram,
+          tokenProgram,
+          associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID
+        })
+        .signers([payer])
+        .rpc();
+      assert.fail("The transaction should have failed due to invalid input");
+    } catch (err) {
+      assert.equal(err.error.errorCode.code, "InvalidInput", "Expected InvalidInput error");
+    }
+  });
+
 });
